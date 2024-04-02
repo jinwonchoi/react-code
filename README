@@ -63,4 +63,4 @@ localhost:3000을 호출하면
 3. main.tsx가 실행
 4. index.html에 id="root"로 선언된 div 돔으로 App.tsx 메인컴포넌트를 호출함
 
-
+react
