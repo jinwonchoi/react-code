@@ -1,0 +1,66 @@
+panchok_admin_front 
+panchok_scm_front
+==>vite.js 프레임웍을 사용하는 react js web 
+fo_front  
+==>vue js사용하는 web
+
+panchok_admin_api 
+panchok_api 
+panchok_batch
+==>springboot Rest API방식 gradle 프로젝트 
+
+보통 vue, react - springboot 조합인 경우
+개발환경에서는 springboot을 먼저 띄워 rest api 서버역할하고 
+vue, react web application을 도스창에서 실행해서 
+ browser page(App.vue, App.js) <-> vue / react application <-> springboot application
+ 3개 각각 통신함
+ 
+이때 springboot 은 별도 포트를 가지고 application.properties application.yml에 server.port 로 지정하고 
+vue나 react는 vue.config.js, vite.config.ts에 
+server/port로 설정한다
+브라우저는 react나 vue에서 설정한 포트로 localhost:8080 이렇게 url을 치면 page를 오픈함
+
+
+각 연동기능 확인방법
+* 스프링의 경우 junit으로 springboot환경 단위테스트로 하나씩 기능확인가능
+* vue의 경우
+ url(http://localhost:8080)을 열면 main.js이 먼저 실행되고  App.vue -> main.vue 순으로 호출됨
+ main.js를 보면 
+ App.vue, store, router등 몇가지 호출을 하는데
+ App.vue SPA(single page application)구조에서 base가 되는 메인 컴포넌트
+ store: App.vue 인스턴스가 관리하는 데이터관리소기능
+ router: 메뉴기능으로 single page상에서 메인컴포넌트위에 로드되는 자식컴포넌트들을 네비게이트
+ 
+react와 vue는 브라우저 dev tool상에서 디버깅되는데 
+브라우저 extension인 react dev tool, vue dev tool을 extension 설치하면 개별 기능 확인가능
+
+** vue상에서 배너 목록이 뜨는과정:
+1. 최초로 띄우면 App.vue상에 로딩되고 main.vue가 로딩
+2. main.vue 컴포넌트의 created 이벤트가 실행(OnCreated)
+3. created -> init() -> getBannerList 실행
+4. getBannerList는 /api/main/main.js에 선언된 getBannerList함수를 호출 
+5. main.js의 getBannerList는 /utils/request.js의 service를 실행(request라 선언했는데 실제로는 axios 컴포넌트를 service라는 이름으로 선언한 놈)
+** request를 async방식으로 호출하면 axios의 http 호출이 이루어지고 request.js(아직 알필요는 없지만)안에 보면 
+http request, response마다 기본적으로 해줘야 할 오류처리나 헤더의 인증(accesstoken)등을 해줌
+
+6. http호출하는 놈인 
+/api/main/main.js 의 함수선언을 보면
+export function getBannerList(data) {
+	return request({
+		url: '/main/getAllBannerList',
+		method: 'post',
+		data,
+	});
+}
+data를 /fo_api/main/getAllBannerList (스프링부트 아마 panchok_api로 보임)
+ 
+
+
+** react에서 GetSellerListRequest를 호출하는 과정
+1. 최초 vite.config.ts에서 선언된 포트인 3000번으로 브라우저상에서 
+localhost:3000을 호출하면 
+2. index.html이 호출되고 
+3. main.tsx가 실행
+4. index.html에 id="root"로 선언된 div 돔으로 App.tsx 메인컴포넌트를 호출함
+
+
